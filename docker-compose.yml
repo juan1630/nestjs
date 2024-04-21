@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+ db:
+    image: postgres:14
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    container_name: ${DB_NAME}
+    volumes:
+      - finvero-db:/var/lib/postgresql/data
+
+ admin:
+    image: dpage/pgadmin4
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 80:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_PASSWORD}
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+ app:
+  build: .
+  ports:
+    - 3200:3200
+  depends_on:
+  - db
+  - admin
+
+
+volumes:
+  finvero-db:
+    external: false
